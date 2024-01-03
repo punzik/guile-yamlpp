@@ -1,0 +1,468 @@
+# -*- mode: org -*-
+#+TITLE: Guile YAMLPP
+
+Guile YAMLPP provides the ~yamlpp~ module for handling YAML documents
+in Guile Scheme.  It is a wrapper around the [[https://github.com/jbeder/yaml-cpp][yaml-cpp]] library.
+
+* Installation
+
+** Install on GNU Guix
+
+Installation is relatively straightforward if you are using the [[https://guix.gnu.org/][Guix]]
+package manager.  To find out whether the package is available on your
+system, run:
+
+#+BEGIN_SRC sh
+  guix search guile-yamlpp
+#+END_SRC
+
+If the package is not yet available, add the [[https://gitlab.com/yorgath/guix-channel][developer's channel]] to
+your list of channels (as described in the Guix [[https://guix.gnu.org/manual/en/html_node/Specifying-Additional-Channels.html][manual]]), then run
+~guix pull~.
+
+Execute this command to install the package:
+
+#+BEGIN_SRC sh
+  guix install guile-yamlpp
+#+END_SRC
+
+** Install using a distribution tarball
+
+If you are not on Guix, you can install the module from the
+distributed archive.  Download the archive of the latest [[https://gitlab.com/yorgath/guile-yamlpp/-/releases][release]] and
+run the following commands:
+
+#+BEGIN_SRC sh
+  tar -xf guile-yamlpp-0.1.tar.gz
+  cd guile-yamlpp-0.1
+  ./configure && make && sudo make install
+#+END_SRC
+
+* Usage
+
+To use YAMLPP in Guile, import the ~yamlpp~ module:
+
+#+BEGIN_SRC scheme
+  (use-modules (yamlpp))
+#+END_SRC
+
+* Reading YAML
+
+The module provides the following procedures for converting YAML
+documents to Scheme objects:
+
+** ~yaml-load~
+
+Convert a string that contains YAML expressions to a Scheme object.
+For example:
+
+#+BEGIN_SRC scheme
+  (yaml-load "[3, 2, 1, null]")
+
+  #(3 2 1 null)
+#+END_SRC
+
+The mapping of YAML entities to Scheme objects is relatively
+straightforward, provided you keep in mind the following rules:
+
+- YAML sequences are converted to Scheme vectors.
+- YAML mappings are converted to association lists.
+- Null values are converted to the ~'null~ symbol.
+
+** ~yaml-load-all~
+
+Like ~yaml-load~, but this one can handle multiple YAML documents.  It
+returns a /list/ of Scheme objects, one for each YAML document:
+
+#+BEGIN_SRC scheme
+  (yaml-load-all "[1, 2, 3]\n---\n[4, 5, 6]")
+
+  (#(1 2 3) #(4 5 6))
+#+END_SRC
+
+** ~yaml-load-file~
+
+Like ~yaml-load~, but it reads the string from the file at the given
+path.
+
+** ~yaml-load-all-from-file~
+
+In essence ~yaml-load-file~ and ~yaml-load-all~ combined.
+
+* Writing YAML
+
+You can use the ~yamlpp~ module to create YAML documents.  Note
+however that the procedures provided by the current implementation
+are, more or less, simple wrappers of ~yaml-cpp~ Emitter methods.  The
+result is an overly imperative interface style, which may disappoint
+some Scheme users.  The implementation is also probably prone to
+concurrency problems, so it is better to avoid using the same emitter
+object across threads.  Alas, precise manipulation of style is
+important when writing discrete YAML elements, which makes a purely
+functional interface not an easy thing to design.  Nevertheless, if
+you are willing to give it a try, read on.
+
+** Emitting Scheme objects as YAML
+
+You convert Scheme objects to YAML by writing them to an emitter
+object.  Use the ~make-yaml-emitter~ procedure to create one:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+#+END_SRC
+
+Use the ~yaml-emit!~ procedure to send Scheme objects to the emitter:
+
+#+BEGIN_SRC scheme
+  (yaml-emit! emitter #("a string" 42))
+#+END_SRC
+
+The ~yaml-emit!~ procedure is able to recognize a range of object
+types and emit the appropriate YAML for each one of them.  Keep the
+following in mind:
+
+- Strings are emitted without quotes, unless necessary or forced (see
+  the next section on how to apply styles).
+- Integers must fall within the C ~long long~ range.
+- Real numbers are emitted in decimal notation.  This includes exact
+  (rational) reals, since YAML does not support fractions.
+- Booleans ~#t~ and ~#f~ are emitted as ~true~ and ~false~
+  respectively by default.  The next section describes how you can
+  emit booleans in the older YAML 1.1 alternative styles (not
+  recommended).
+- You must use the ~'null~ symbol to write the null value in a YAML
+  document.  Note that this is always written as a tilde (=~=) in
+  YAML.  There is no way to change this with ~yaml-cpp~ 0.6.3.
+- Symbols are /not/ converted to strings.  It is an error to try to
+  emit a symbol (except ~'null~).
+- Scheme vectors, /not/ lists, are emitted as YAML sequences.
+- Association lists are emitted as YAML mappings.
+
+Use the ~yaml-emitter-string~ procedure to get the YAML document(s) as
+a Scheme string:
+
+#+BEGIN_SRC scheme
+  (yaml-emitter-string emitter)
+
+  "- a string\n- 42"
+#+END_SRC
+
+Sometimes it is necessary to emit the elements of a sequence one by
+one, instead of emitting a Scheme vector.  This is often the case when
+one wants to define the style of particular YAML elements (see next
+section).  You can use the ~yaml-begin-seq!~ and ~yaml-end-seq!~ for
+that:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-begin-seq! emitter)
+  (yaml-emit! emitter "First")
+  (yaml-emit! emitter "Second")
+  (yaml-end-seq! emitter)
+  (display (yaml-emitter-string emitter)) (newline)
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  - First
+  - Second
+#+END_SRC
+
+You can do the same with mappings, though it is a bit more complicated
+since you will have to emit each key and value separately:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-begin-map! emitter)
+  (yaml-emit-key! emitter)
+  (yaml-emit! emitter "Name")
+  (yaml-emit-value! emitter)
+  (yaml-emit! emitter "Methuselah")
+  (yaml-emit-key! emitter)
+  (yaml-emit! emitter "Age")
+  (yaml-emit-value! emitter)
+  (yaml-emit! emitter "969")
+  (yaml-end-map! emitter)
+  (display (yaml-emitter-string emitter)) (newline)
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  Name: Methuselah
+  Age: 969
+#+END_SRC
+
+Inappropriate closure of compound elements can leave the emitter in a
+bad state.  You can check the state of the emitter by using the
+~yaml-emitter-good?~ procedure:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-begin-seq! emitter)
+  (yaml-begin-map! emitter)
+  ;; Map not done yet.
+  (yaml-end-seq! emitter)
+  (yaml-emitter-good? emitter)
+
+  #f
+#+END_SRC
+
+** Setting the style of YAML elements
+
+Use the ~yaml-set-style!~ procedure to affect the style of /just/ the
+next element you are going to write to the emitter:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-set-style! emitter 'flow 'single-quoted)
+  ;; Affects the whole sequence, but only that.
+  (yaml-emit! emitter #("first" "second"))
+  (display (yaml-emitter-string emitter)) (newline)
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  ['first', 'second']
+#+END_SRC
+
+The ~yaml-set-style!~ takes an arbitrary number of style /manipulators/,
+which must be written as Scheme symbols.  Not all manipulators affect
+every YAML element type.  The module provides the following manipulators,
+whose effect should be obvious:
+
+| Manipulator       | Affects       |
+|-------------------+---------------|
+| ~double-quoted~   | string        |
+| ~single-quoted~   | string        |
+| ~literal~         | string        |
+| ~yes-no-bool~     | boolean       |
+| ~true-false-bool~ | boolean       |
+| ~on-off-bool~     | boolean       |
+| ~lower-case~      | boolean       |
+| ~upper-case~      | boolean       |
+| ~camel-case~      | boolean       |
+| ~long-bool~       | boolean       |
+| ~short-bool~      | boolean       |
+| ~dec~             | integer       |
+| ~hex~             | integer       |
+| ~oct~             | integer       |
+| ~block~           | sequence, map |
+| ~flow~            | sequence, map |
+| ~auto~            | everything    |
+
+You can set the format of a specific type globally by using the
+following procedures:
+
+- ~yaml-set-string-format!~
+- ~yaml-set-bool-format!~
+- ~yaml-set-int-base!~
+- ~yaml-set-seq-format!~
+- ~yaml-set-map-format!~
+
+For example:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-set-string-format! emitter 'single-quoted)
+  (yaml-begin-seq! emitter)
+  (yaml-emit! emitter "First")
+  (yaml-emit! emitter "Second")
+  (yaml-end-seq! emitter)
+  (display (yaml-emitter-string emitter)) (newline)
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  - 'First'
+  - 'Second'
+#+END_SRC
+
+The ~auto~ manipulator can be used to revert the style of specific
+elements to the default settings:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-set-style! emitter 'single-quoted)
+  ;; The style affects the format of all strings in the sequence.
+  (yaml-begin-seq! emitter)
+  ;; We want just the first string to be unquoted.
+  (yaml-set-style! emitter 'auto)
+  (yaml-emit! emitter "First")
+  ;; The style of the second string is not affected.
+  (yaml-emit! emitter "Second")
+  (yaml-end-seq! emitter)
+  (display (yaml-emitter-string emitter)) (newline)
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  - First
+  - 'Second'
+#+END_SRC
+
+** Miscellanea
+
+You can write multiple YAML documents to the same string.  Use
+procedures ~yaml-begin-doc!~ and ~yaml-end-doc!~ to insert the
+appropriate delimiters:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-begin-doc! emitter)
+  (yaml-emit! emitter "First document")
+  (yaml-begin-doc! emitter)
+  (yaml-emit! emitter "Second document")
+  (yaml-end-doc! emitter)
+  (display (yaml-emitter-string emitter))
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  ---
+  First document
+  ---
+  Second document
+  ...
+#+END_SRC
+
+You can add comments to the YAML document by using the
+~yaml-emit-comment!~ procedure:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-emit! emitter 42)
+  (yaml-emit-comment! emitter "This answers everything!")
+  (display (yaml-emitter-string emitter)) (newline)
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  42  # This answers everything!
+#+END_SRC
+
+To place a comment in a line by itself, it may be necessary to use the
+~yaml-emit-newline!~ procedure:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-emit! emitter 42)
+  (yaml-emit-newline! emitter)
+  (yaml-emit-comment! emitter "This answered everything!")
+  (display (yaml-emitter-string emitter)) (newline)
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  42
+  # This answered everything!
+#+END_SRC
+
+If you need to use the YAML alias feature, you can do it with the
+~yaml-emit-anchor!~ and ~yaml-emit-alias!~ procedures:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-begin-seq! emitter)
+  (yaml-emit-anchor! emitter "shantih")
+  (yaml-emit! emitter "peace")
+  (yaml-emit-alias! emitter "shantih")
+  (yaml-emit-alias! emitter "shantih")
+  (yaml-end-seq! emitter)
+  (display (yaml-emitter-string emitter)) (newline)
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  - &shantih peace
+  - *shantih
+  - *shantih
+#+END_SRC
+
+Regarding indentation, the default setting is to use two spaces.  You
+can change that globally by using the ~yaml-set-indent!~ procedure:
+
+#+BEGIN_SRC scheme
+  (define emitter (make-yaml-emitter))
+  (yaml-set-indent! emitter 4)
+  (yaml-emit! emitter #("First" "Second"))
+  (display (yaml-emitter-string emitter)) (newline)
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  -   First
+  -   Second
+#+END_SRC
+
+* Hacking
+
+If you want to modify YAMLPP, start by cloning the Git repository:
+
+#+BEGIN_SRC sh
+  git clone https://gitlab.com/yorgath/guile-yamlpp
+  cd guile-yamlpp
+#+END_SRC
+
+Setting up a sufficient development environment is /far/ easier on GNU
+Guix of course; just do:
+
+#+BEGIN_SRC sh
+  guix shell -Df guix.scm
+#+END_SRC
+
+If you are not on Guix, you will have to take care of installing the
+development dependencies yourself.  You will need the following (at
+least):
+
+- The GNU C++ toolchain
+- GNU Automake
+- The ~pkg-config~ tool
+- The ~yaml-cpp~ library (including headers)
+- Guile 3.0 (including headers)
+
+The project uses GNU Automake for its build system.  Follow the
+standard procedure to build the package (this will build both the C++
+library and the Scheme module):
+
+#+BEGIN_SRC sh
+  ./bootstrap
+  ./configure
+  make
+  make check
+#+END_SRC
+
+The configuration step generates a ~pre-inst-env~ script that is very
+handy if you want to use the YAMLPP module without installing it
+first.  This script starts a program in an appropriate environment, so
+that Guile can find the C++ extension library and the ~yamlpp~ module.
+For example, this is how you start a Guile REPL:
+
+#+BEGIN_SRC sh
+  ./pre-inst-env guile
+#+END_SRC
+
+You should now be able to load the YAMLPP module and start using it:
+
+#+BEGIN_SRC scheme
+  ,use (yamlpp)
+#+END_SRC
+
+The bundled ~guix.scm~ package definition uses the distribution
+archive as its source, which means that you /must/ create the archive
+if you want to build the package using Guix.  You create the archive
+using the standard GNU Makefile targets:
+
+#+BEGIN_SRC sh
+  make dist
+  make distcheck
+#+END_SRC
+
+With the archive in place, you can now use the bundled ~guix.scm~ to
+build and install the package:
+
+#+BEGIN_SRC sh
+  guix build -f guix.scm
+  guix shell guile -f guix.scm
+#+END_SRC
+
+* Acknowledgements
+
+- Guile YAMLPP was developed on [[https://guix.gnu.org/][GNU Guix]].
+
+- The [[https://github.com/mwette/guile-libyaml][guile-libyaml]] and [[https://github.com/aconchillo/guile-json][guile-json]] modules provided inspiration at
+  several points during the implementation.
+
+- YAMLPP includes a copy of the ~test-driver.scm~ script from the Guix
+  source.
+
+- Of course, this module would not exist without the [[https://github.com/jbeder/yaml-cpp][yaml-cpp]] library.
