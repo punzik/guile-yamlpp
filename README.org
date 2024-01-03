@@ -437,18 +437,8 @@ You should now be able to load the YAMLPP module and start using it:
   ,use (yamlpp)
 #+END_SRC
 
-The bundled ~guix.scm~ package definition uses the distribution
-archive as its source, which means that you /must/ create the archive
-if you want to build the package using Guix.  You create the archive
-using the standard GNU Makefile targets:
-
-#+BEGIN_SRC sh
-  make dist
-  make distcheck
-#+END_SRC
-
-With the archive in place, you can now use the bundled ~guix.scm~ to
-build and install the package:
+If you want to test how the modified package fares with Guix, you can
+use the bundled ~guix.scm~ definition:
 
 #+BEGIN_SRC sh
   guix build -f guix.scm

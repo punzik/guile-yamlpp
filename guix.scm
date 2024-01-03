@@ -3,6 +3,7 @@
  (guix packages)
  (guix gexp)
  (guix utils)
+ (guix git-download)
  (guix build-system gnu)
  ;;
  ((guix licenses) #:prefix license:)
@@ -12,11 +13,18 @@
  (gnu packages serialization)
  (gnu packages guile))
 
+;; Copied verbatim from the Guix cookbook.
+(define vcs-file?
+  ;; Return true if the given file is under version control.
+  (or (git-predicate (current-source-directory))
+      (const #t)))                                ;not in a Git checkout
+
 (package
   (name "guile-yamlpp")
-  (version "0.1")
-  (source (local-file (string-append (current-source-directory)
-		                     "/" name "-" version ".tar.gz")))
+  (version "dev")
+  (source (local-file "." "guile-yamlpp-dev-checkout"
+                      #:recursive? #t
+                      #:select? vcs-file?))
   (build-system gnu-build-system)
   (native-inputs (list autoconf
                        automake
@@ -25,8 +33,8 @@
   (inputs (list guile-3.0
                 yaml-cpp))
   (native-search-paths (list (search-path-specification
-	                      (variable "GUILE_EXTENSIONS_PATH")
-	                      (files (list "lib/guile/3.0")))))
+                              (variable "GUILE_EXTENSIONS_PATH")
+                              (files (list "lib/guile/3.0")))))
   (synopsis "Guile YAML reader/writer based on @code{yaml-cpp}")
   (description
    "A module for GNU Guile to read and write YAML files.  It works using
