@@ -35,9 +35,9 @@
   (native-search-paths (list (search-path-specification
                               (variable "GUILE_EXTENSIONS_PATH")
                               (files (list "lib/guile/3.0")))))
+  (home-page "https://gitlab.com/yorgath/guile-yamlpp")
   (synopsis "Guile YAML reader/writer based on @code{yaml-cpp}")
   (description
    "A module for GNU Guile to read and write YAML files.  It works using
 bindings to the @code{yaml-cpp} C++ library.")
-  (home-page "https://gitlab.com/yorgath/guile-yamlpp")
   (license license:gpl3+))
