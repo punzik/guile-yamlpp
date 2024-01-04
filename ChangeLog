@@ -1,1 +1,10 @@
-2024-01-02  Georgios Athanasiou  <yorgath@gmail.com>
+2024-01-04  Georgios Athanasiou  <yorgath@gmail.com>
+
+	Use missed procedure name constant
+
+	* cxx/init.cxx (init): Use the SCM_PROC_NODE_TO_ALIST constant
+	instead of the char array.
+
+2024-01-03  Georgios Athanasiou  <yorgath@gmail.com>
+
+	First public release

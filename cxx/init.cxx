@@ -66,7 +66,7 @@ init ()
   }
   {
     void *subr = reinterpret_cast<void*> (yaml_node_to_alist);
-    scm_c_define_gsubr ("yaml-node->alist", 1, 0, 0, subr);
+    scm_c_define_gsubr (SCM_PROC_NODE_TO_ALIST, 1, 0, 0, subr);
   }
 
   init_emitter_type ();
