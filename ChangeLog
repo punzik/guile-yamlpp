@@ -1,9 +1,51 @@
 2024-01-04  Georgios Athanasiou  <yorgath@gmail.com>
 
-	Use missed procedure name constant
+	* cxx/macros.h: Remove file no longer necessary.
 
-	* cxx/init.cxx (init): Use the SCM_PROC_NODE_TO_ALIST constant
-	instead of the char array.
+	* cxx/emitter.cxx
+	(begin_doc): Make it static.
+	(begin_map): Make it static.
+	(begin_seq): Make it static.
+	(emit_alias): Make it static.
+	(emit_boolean): Make it static.
+	(emit_comment): Make it static.
+	(emit_integer): Make it static.
+	(emit_key): Make it static.
+	(emit_newline): Make it static.
+	(emit_null): Make it static.
+	(emit_string): Make it static.
+	(emit_value): Make it static.
+	(emitter_good): Make it static.
+	(emitter_string): Make it static.
+	(end_doc): Make it static.
+	(end_map): Make it static.
+	(end_seq): Make it static.
+	(init_emitter): Move initialization here.
+	(init_emitter_type): Make it static.
+	(make_emitter): Make it static.
+	(set_bool_format): Make it static.
+	(set_indent): Make it static.
+	(set_int_base): Make it static.
+	(set_map_format): Make it static.
+	(set_seq_format): Make it static.
+	(set_string_format): Make it static.
+	(set_style): Make it static.
+
+	* cxx/reader.cxx
+	(init_node_type): Make it static.
+	(init_reader): Move initialization here.
+	(load_node): Make it static.
+	(load_node_from_file): Make it static.
+	(load_nodes): Make it static.
+	(load_nodes_from_file): Make it static.
+	(scalar_value): Make it static.
+	(yaml_node_to_alist): Make it static.
+	(yaml_node_to_list): Make it static.
+	(yaml_node_type): Make it static.
+
+	* cxx/init.cxx (init): Move initialization code to reader.cxx and
+	emitter.cxx.
+
 
 2024-01-03  Georgios Athanasiou  <yorgath@gmail.com>
 

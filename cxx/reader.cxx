@@ -60,7 +60,10 @@ finalize_scm_node (SCM scm_node)
 }
 
 
-void
+/**
+ * Initialize the Guile YAML node type.
+ */
+static void
 init_node_type ()
 {
   SCM name = scm_from_utf8_symbol ("yaml-node");
@@ -241,7 +244,10 @@ guess_scalar_value (const YAML::Node &node)
 // Implementation of functions exposed to Guile.
 
 
-SCM
+/**
+ * Return a symbol that denotes the type of the YAML node.
+ */
+static SCM
 yaml_node_type (SCM scm_node)
 {
   assert_node (scm_node);
@@ -269,7 +275,11 @@ yaml_node_type (SCM scm_node)
 }
 
 
-SCM
+/**
+ * Return the value stored in a scalar YAML node.  Try to guess an
+ * appropriate type if the node is not tagged.
+ */
+static SCM
 scalar_value (SCM scm_node)
 {
   assert_node (scm_node);
@@ -291,7 +301,10 @@ scalar_value (SCM scm_node)
 }
 
 
-SCM
+/**
+ * Return the children of a sequence node as a Guile list.
+ */
+static SCM
 yaml_node_to_list (SCM scm_node)
 {
   assert_node (scm_node);
@@ -306,7 +319,10 @@ yaml_node_to_list (SCM scm_node)
 }
 
 
-SCM
+/**
+ * Return an association list for the map node.
+ */
+static SCM
 yaml_node_to_alist (SCM scm_node)
 {
   assert_node (scm_node);
@@ -324,7 +340,10 @@ yaml_node_to_alist (SCM scm_node)
 }
 
 
-SCM
+/**
+ * Parse a Guile string to a YAML node.
+ */
+static SCM
 load_node (SCM scm_string)
 {
   std::string str = scm_to_cxx_string (scm_string);
@@ -340,7 +359,11 @@ load_node (SCM scm_string)
 }
 
 
-SCM
+/**
+ * Parse a Guile string to a list of nodes, one node for each YAML
+ * document in the string.
+ */
+static SCM
 load_nodes (SCM scm_string)
 {
   std::string str = scm_to_cxx_string (scm_string);
@@ -356,7 +379,10 @@ load_nodes (SCM scm_string)
 }
 
 
-SCM
+/**
+ * Parse a file to a YAML node.
+ */
+static SCM
 load_node_from_file (SCM scm_path)
 {
   std::ifstream s = file_stream (scm_path);
@@ -372,7 +398,10 @@ load_node_from_file (SCM scm_path)
 }
 
 
-SCM
+/**
+ * Parse a file to a list of YAML nodes.
+ */
+static SCM
 load_nodes_from_file (SCM scm_path)
 {
   std::ifstream s = file_stream (scm_path);
@@ -385,4 +414,46 @@ load_nodes_from_file (SCM scm_path)
     {
       return raise_parser_error (e);
     }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+
+
+void
+init_reader ()
+{
+  init_node_type ();
+  {
+    void *subr = reinterpret_cast<void*> (load_node);
+    scm_c_define_gsubr ("yaml-load-node", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (load_nodes);
+    scm_c_define_gsubr ("yaml-load-nodes", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (load_node_from_file);
+    scm_c_define_gsubr ("yaml-load-node-from-file", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (load_nodes_from_file);
+    scm_c_define_gsubr ("yaml-load-nodes-from-file", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (yaml_node_type);
+    scm_c_define_gsubr ("yaml-node-type", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (scalar_value);
+    scm_c_define_gsubr ("yaml-scalar-value", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (yaml_node_to_list);
+    scm_c_define_gsubr ("yaml-node->list", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (yaml_node_to_alist);
+    scm_c_define_gsubr ("yaml-node->alist", 1, 0, 0, subr);
+  }
 }

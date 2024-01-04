@@ -66,7 +66,10 @@ finalize_scm_emitter (SCM scm_emitter)
 }
 
 
-void
+/**
+ * Initialize the Guile YAML emitter type.
+ */
+static void
 init_emitter_type ()
 {
   SCM name = scm_from_utf8_symbol ("yaml-emitter");
@@ -173,14 +176,20 @@ manipulator (SCM scm_symbol)
 // Implementation of the functions exposed to Guile.
 
 
-SCM
+/**
+ * Create a new YAML emitter.
+ */
+static SCM
 make_emitter ()
 {
   return make_scm_emitter ();
 }
 
 
-SCM
+/**
+ * Return a Scheme boolean that reveals the state of the YAML emitter.
+ */
+static SCM
 emitter_good (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -188,7 +197,10 @@ emitter_good (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * Return a Scheme string from the contents of the YAML emitter.
+ */
+static SCM
 emitter_string (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -196,7 +208,10 @@ emitter_string (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * Write the null symbol to the emitter.
+ */
+static SCM
 emit_null (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -205,7 +220,10 @@ emit_null (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * Write a string to the YAML emitter.
+ */
+static SCM
 emit_string (SCM scm_emitter, SCM scm_string)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -215,7 +233,10 @@ emit_string (SCM scm_emitter, SCM scm_string)
 }
 
 
-SCM
+/**
+ * Write a boolean value to the YAML emitter.
+ */
+static SCM
 emit_boolean (SCM scm_emitter, SCM scm_boolean)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -225,7 +246,13 @@ emit_boolean (SCM scm_emitter, SCM scm_boolean)
 }
 
 
-SCM
+/**
+ * Write an exact integer to the YAML emitter.
+ *
+ * It raises an out-of-range error if the Guile integer is out of the
+ * long long range of the platform.
+ */
+static SCM
 emit_integer (SCM scm_emitter, SCM scm_integer)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -234,7 +261,10 @@ emit_integer (SCM scm_emitter, SCM scm_integer)
 }
 
 
-SCM
+/**
+ * Write a comment to the YAML emitter.
+ */
+static SCM
 emit_comment (SCM scm_emitter, SCM scm_string)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -244,7 +274,10 @@ emit_comment (SCM scm_emitter, SCM scm_string)
 }
 
 
-SCM
+/**
+ * Cause a line break.
+ */
+static SCM
 emit_newline (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -253,7 +286,10 @@ emit_newline (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * Begin a YAML document.
+ */
+static SCM
 begin_doc (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -262,7 +298,10 @@ begin_doc (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * End a YAML document.
+ */
+static SCM
 end_doc (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -271,7 +310,10 @@ end_doc (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * Begin a YAML sequence.
+ */
+static SCM
 begin_seq (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -280,7 +322,10 @@ begin_seq (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * End a YAML sequence.
+ */
+static SCM
 end_seq (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -289,7 +334,10 @@ end_seq (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * Begin a YAML mapping.
+ */
+static SCM
 begin_map (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -298,7 +346,10 @@ begin_map (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * End a YAML mapping.
+ */
+static SCM
 end_map (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -307,7 +358,10 @@ end_map (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * Direct the emitter to expect a key for a YAML mapping.
+ */
+static SCM
 emit_key (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -316,7 +370,10 @@ emit_key (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * Direct the emitter to expect a value for a YAML mapping.
+ */
+static SCM
 emit_value (SCM scm_emitter)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -325,7 +382,10 @@ emit_value (SCM scm_emitter)
 }
 
 
-SCM
+/**
+ * Write a YAML anchor.
+ */
+static SCM
 emit_anchor (SCM scm_emitter, SCM scm_string)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -335,7 +395,10 @@ emit_anchor (SCM scm_emitter, SCM scm_string)
 }
 
 
-SCM
+/**
+ * Write a YAML alias.
+ */
+static SCM
 emit_alias (SCM scm_emitter, SCM scm_string)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -345,7 +408,10 @@ emit_alias (SCM scm_emitter, SCM scm_string)
 }
 
 
-SCM
+/**
+ * Set the style for the next element.
+ */
+static SCM
 set_style (SCM scm_emitter, SCM scm_symbol)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -354,7 +420,10 @@ set_style (SCM scm_emitter, SCM scm_symbol)
 }
 
 
-SCM
+/**
+ * Set the format to emit strings in.
+ */
+static SCM
 set_string_format (SCM scm_emitter, SCM scm_symbol)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -364,7 +433,10 @@ set_string_format (SCM scm_emitter, SCM scm_symbol)
 }
 
 
-SCM
+/**
+ * Set the format to emit booleans in.
+ */
+static SCM
 set_bool_format (SCM scm_emitter, SCM scm_symbol)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -374,7 +446,10 @@ set_bool_format (SCM scm_emitter, SCM scm_symbol)
 }
 
 
-SCM
+/**
+ * Set the numeral system for emitting integers.
+ */
+static SCM
 set_int_base (SCM scm_emitter, SCM scm_symbol)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -384,7 +459,10 @@ set_int_base (SCM scm_emitter, SCM scm_symbol)
 }
 
 
-SCM
+/**
+ * Set the format to emit sequences in.
+ */
+static SCM
 set_seq_format (SCM scm_emitter, SCM scm_symbol)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -394,7 +472,10 @@ set_seq_format (SCM scm_emitter, SCM scm_symbol)
 }
 
 
-SCM
+/**
+ * Set the format to emit mappings in.
+ */
+static SCM
 set_map_format (SCM scm_emitter, SCM scm_symbol)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
@@ -404,11 +485,128 @@ set_map_format (SCM scm_emitter, SCM scm_symbol)
 }
 
 
-SCM
+/**
+ * Set the number of indentation spaces.
+ */
+static SCM
 set_indent (SCM scm_emitter, SCM scm_length)
 {
   YAML::Emitter *emitter = c_emitter (scm_emitter);
   size_t length = scm_to_size_t (scm_length);
   *emitter << YAML::Indent (length);
   return SCM_UNDEFINED;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+
+
+void
+init_emitter ()
+{
+  init_emitter_type ();
+  {
+    void *subr = reinterpret_cast<void*> (make_emitter);
+    scm_c_define_gsubr ("make-yaml-emitter", 0, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emitter_good);
+    scm_c_define_gsubr ("yaml-emitter-good?", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emitter_string);
+    scm_c_define_gsubr ("yaml-emitter-string", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_null);
+    scm_c_define_gsubr ("yaml-emit-null!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_string);
+    scm_c_define_gsubr ("yaml-emit-string!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_boolean);
+    scm_c_define_gsubr ("yaml-emit-boolean!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_integer);
+    scm_c_define_gsubr ("yaml-emit-integer!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_comment);
+    scm_c_define_gsubr ("yaml-emit-comment!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_newline);
+    scm_c_define_gsubr ("yaml-emit-newline!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (begin_doc);
+    scm_c_define_gsubr ("yaml-begin-doc!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (end_doc);
+    scm_c_define_gsubr ("yaml-end-doc!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (begin_seq);
+    scm_c_define_gsubr ("yaml-begin-seq!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (end_seq);
+    scm_c_define_gsubr ("yaml-end-seq!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (begin_map);
+    scm_c_define_gsubr ("yaml-begin-map!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (end_map);
+    scm_c_define_gsubr ("yaml-end-map!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_key);
+    scm_c_define_gsubr ("yaml-emit-key!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_value);
+    scm_c_define_gsubr ("yaml-emit-value!", 1, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_anchor);
+    scm_c_define_gsubr ("yaml-emit-anchor!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_alias);
+    scm_c_define_gsubr ("yaml-emit-alias!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (set_style);
+    scm_c_define_gsubr ("yaml-set-style-1!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (set_string_format);
+    scm_c_define_gsubr ("yaml-set-string-format-1!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (set_bool_format);
+    scm_c_define_gsubr ("yaml-set-bool-format-1!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (set_int_base);
+    scm_c_define_gsubr ("yaml-set-int-base!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (set_seq_format);
+    scm_c_define_gsubr ("yaml-set-seq-format-1!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (set_map_format);
+    scm_c_define_gsubr ("yaml-set-map-format-1!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (set_indent);
+    scm_c_define_gsubr ("yaml-set-indent!", 2, 0, 0, subr);
+  }
 }
