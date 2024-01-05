@@ -426,34 +426,34 @@ init_reader ()
   init_node_type ();
   {
     void *subr = reinterpret_cast<void*> (load_node);
-    scm_c_define_gsubr ("yaml-load-node", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-load-node", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (load_nodes);
-    scm_c_define_gsubr ("yaml-load-nodes", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-load-nodes", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (load_node_from_file);
-    scm_c_define_gsubr ("yaml-load-node-from-file", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-load-node-from-file", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (load_nodes_from_file);
-    scm_c_define_gsubr ("yaml-load-nodes-from-file", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-load-nodes-from-file", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (yaml_node_type);
-    scm_c_define_gsubr ("yaml-node-type", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-node-type", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (scalar_value);
-    scm_c_define_gsubr ("yaml-scalar-value", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-scalar-value", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (yaml_node_to_list);
-    scm_c_define_gsubr ("yaml-node->list", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-node->list", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (yaml_node_to_alist);
-    scm_c_define_gsubr ("yaml-node->alist", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-node->alist", 1, 0, 0, subr);
   }
 }

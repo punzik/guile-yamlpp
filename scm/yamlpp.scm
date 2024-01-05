@@ -67,6 +67,72 @@
     (warn text)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Wrap the primitive procedures used for reading YAML.
+
+(define (yaml-load-node string)
+  "Read the first YAML document present in the string.
+
+The result is a <yaml-node> object."
+  (prim:yaml-load-node string))
+
+(define (yaml-load-nodes string)
+  "Read all the YAML documents present in the string.
+
+The result is a list of <yaml-node> objects."
+  (prim:yaml-load-nodes string))
+
+(define (yaml-load-node-from-file path)
+  "Read the first YAML document from the file at the given path.
+
+The result is a <yaml-node> object."
+  (prim:yaml-load-node-from-file path))
+
+(define (yaml-load-nodes-from-file path)
+  "Read all the YAML documents from the file at the given path.
+
+The result is a list of <yaml-node> objects."
+  (prim:yaml-load-nodes-from-file path))
+
+(define (yaml-node-type node)
+  "Return a symbol that denotes the type of the YAML node.
+
+The result is one of the following symbols:
+
+- null
+- scalar
+- sequence
+- map
+- undefined"
+  (prim:yaml-node-type node))
+
+(define (yaml-scalar-value node)
+  "Return the value stored in the scalar YAML node.
+
+This procedure should be used when it is known that NODE holds a
+scalar YAML value that it is *not* null (i.e. nulls must be treated as
+a separate case).  It tries to guess the correct type for the value,
+resorting to string when everything else fails.  The type of the
+result can be one of the following Scheme types:
+
+- boolean
+- integer
+- double
+- string"
+  (prim:yaml-scalar-value node))
+
+(define (yaml-node->list node)
+  "Return a list of nodes of a YAML sequence node.
+
+This should only be used for nodes of type 'sequence."
+  (prim:yaml-node->list node))
+
+(define (yaml-node->alist node)
+  "Return an association list from the pairs in a YAML mapping node
+
+This should only be used for nodes of type 'map."
+  (prim:yaml-node->alist node))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (yaml-load text)
   "Parse first YAML document in the string."
@@ -104,6 +170,137 @@
                   (expand-node (cdr pair))))
           (yaml-node->alist node)))
     (else 'undefined)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Wrap the primitive procedures used for emitting YAML.
+
+(define (make-yaml-emitter)
+  "Return a new object that can be used to create YAML documents."
+  (prim:make-yaml-emitter))
+
+(define (yaml-emitter-good? emitter)
+  "Return a boolean that shows the state of a YAML emitter.
+
+It returns `#f' when the EMITTER is in a bad state.  This can happen
+for example when the user has requested the ending of a parent
+element (e.g. a sequence) when one of its children is still open."
+  (prim:yaml-emitter-good? emitter))
+
+(define (yaml-emitter-string emitter)
+  "Return the contents of the YAML EMITTER as a string."
+  (prim:yaml-emitter-string emitter))
+
+(define (yaml-emit-null! emitter)
+  "Emit the null YAML value."
+  (prim:yaml-emit-null! emitter))
+
+(define (yaml-emit-string! emitter string)
+  "Write a string to the YAML document."
+  (prim:yaml-emit-string! emitter string))
+
+(define (yaml-emit-boolean! emitter boolean)
+  "Write a boolean value to the YAML document."
+  (prim:yaml-emit-boolean! emitter boolean))
+
+(define (yaml-emit-integer! emitter number)
+  "Write an integer to the YAML document."
+  (prim:yaml-emit-integer! emitter number))
+
+(define (yaml-emit-comment! emitter string)
+  "Write a comment to the YAML document."
+  (prim:yaml-emit-comment! emitter string))
+
+(define (yaml-emit-newline! emitter)
+  "Add a line break to the YAML document."
+  (prim:yaml-emit-newline! emitter))
+
+(define (yaml-begin-doc! emitter)
+  "Mark the beginning of a new YAML document."
+  (prim:yaml-begin-doc! emitter))
+
+(define (yaml-end-doc! emitter)
+  "Mark the ending of the current YAML document."
+  (prim:yaml-end-doc! emitter))
+
+(define (yaml-begin-seq! emitter)
+  "Start a YAML sequence."
+  (prim:yaml-begin-seq! emitter))
+
+(define (yaml-end-seq! emitter)
+  "End the current YAML sequence."
+  (prim:yaml-end-seq! emitter))
+
+(define (yaml-begin-map! emitter)
+  "Start a YAML mapping."
+  (prim:yaml-begin-map! emitter))
+
+(define (yaml-end-map! emitter)
+  "End the current YAML mapping."
+  (prim:yaml-end-map! emitter))
+
+(define (yaml-emit-key! emitter)
+  "Instruct the emitter to treat the next element it receives as a key of
+the current YAML mapping."
+  (prim:yaml-emit-key! emitter))
+
+(define (yaml-emit-value! emitter)
+  "Instruct the emitter to treat the next element it receives as the
+value of the current YAML mapping pair."
+  (prim:yaml-emit-value! emitter))
+
+(define (yaml-emit-anchor! emitter name)
+  "Create an anchor for the next YAML element."
+  (prim:yaml-emit-anchor! emitter name))
+
+(define (yaml-emit-alias! emitter name)
+  "Add an alias using the anchor with the given name."
+  (prim:yaml-emit-alias! emitter name))
+
+(define (yaml-set-style-1! emitter manipulator)
+  "Set the style for the next YAML element.
+
+MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
+valid manipulators."
+  (prim:yaml-set-style-1! emitter manipulator))
+
+(define (yaml-set-string-format-1! emitter manipulator)
+  "Affect the style of emitted YAML strings globally.
+
+MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
+valid manipulators."
+  (prim:yaml-set-string-format-1! emitter manipulator))
+
+(define (yaml-set-bool-format-1! emitter manipulator)
+  "Affect the style of emitted YAML booleans globally.
+
+MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
+valid manipulators."
+  (prim:yaml-set-bool-format-1! emitter manipulator))
+
+(define (yaml-set-int-base! emitter manipulator)
+  "Set the numeral system for the emitted integers.
+
+MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
+valid manipulators."
+  (prim:yaml-set-int-base! emitter manipulator))
+
+(define (yaml-set-seq-format-1! emitter manipulator)
+  "Affect the style of emitted YAML sequences globally.
+
+MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
+valid manipulators."
+  (prim:yaml-set-seq-format-1! emitter manipulator))
+
+(define (yaml-set-map-format-1! emitter manipulator)
+  "Affect the style of emitted YAML mappings globally.
+
+MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
+valid manipulators."
+  (prim:yaml-set-map-format-1! emitter manipulator))
+
+(define (yaml-set-indent! emitter length)
+  "Set the number of spaces used for indentation."
+  (prim:yaml-set-indent! emitter length))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

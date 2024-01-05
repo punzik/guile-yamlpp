@@ -507,106 +507,106 @@ init_emitter ()
   init_emitter_type ();
   {
     void *subr = reinterpret_cast<void*> (make_emitter);
-    scm_c_define_gsubr ("make-yaml-emitter", 0, 0, 0, subr);
+    scm_c_define_gsubr ("prim:make-yaml-emitter", 0, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emitter_good);
-    scm_c_define_gsubr ("yaml-emitter-good?", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emitter-good?", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emitter_string);
-    scm_c_define_gsubr ("yaml-emitter-string", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emitter-string", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_null);
-    scm_c_define_gsubr ("yaml-emit-null!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-null!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_string);
-    scm_c_define_gsubr ("yaml-emit-string!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-string!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_boolean);
-    scm_c_define_gsubr ("yaml-emit-boolean!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-boolean!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_integer);
-    scm_c_define_gsubr ("yaml-emit-integer!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-integer!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_comment);
-    scm_c_define_gsubr ("yaml-emit-comment!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-comment!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_newline);
-    scm_c_define_gsubr ("yaml-emit-newline!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-newline!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (begin_doc);
-    scm_c_define_gsubr ("yaml-begin-doc!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-begin-doc!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (end_doc);
-    scm_c_define_gsubr ("yaml-end-doc!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-end-doc!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (begin_seq);
-    scm_c_define_gsubr ("yaml-begin-seq!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-begin-seq!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (end_seq);
-    scm_c_define_gsubr ("yaml-end-seq!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-end-seq!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (begin_map);
-    scm_c_define_gsubr ("yaml-begin-map!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-begin-map!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (end_map);
-    scm_c_define_gsubr ("yaml-end-map!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-end-map!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_key);
-    scm_c_define_gsubr ("yaml-emit-key!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-key!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_value);
-    scm_c_define_gsubr ("yaml-emit-value!", 1, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-value!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_anchor);
-    scm_c_define_gsubr ("yaml-emit-anchor!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-anchor!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_alias);
-    scm_c_define_gsubr ("yaml-emit-alias!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-emit-alias!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (set_style);
-    scm_c_define_gsubr ("yaml-set-style-1!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-set-style-1!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (set_string_format);
-    scm_c_define_gsubr ("yaml-set-string-format-1!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-set-string-format-1!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (set_bool_format);
-    scm_c_define_gsubr ("yaml-set-bool-format-1!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-set-bool-format-1!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (set_int_base);
-    scm_c_define_gsubr ("yaml-set-int-base!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-set-int-base!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (set_seq_format);
-    scm_c_define_gsubr ("yaml-set-seq-format-1!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-set-seq-format-1!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (set_map_format);
-    scm_c_define_gsubr ("yaml-set-map-format-1!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-set-map-format-1!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (set_indent);
-    scm_c_define_gsubr ("yaml-set-indent!", 2, 0, 0, subr);
+    scm_c_define_gsubr ("prim:yaml-set-indent!", 2, 0, 0, subr);
   }
 }

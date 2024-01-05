@@ -1,3 +1,45 @@
+2024-01-06  Georgios Athanasiou  <yorgath@gmail.com>
+
+	* scm/yamlpp.scm
+	(yaml-load-node): New primitive wrapper.
+	(yaml-load-node-from-file): New primitive wrapper.
+	(yaml-load-nodes): New primitive wrapper.
+	(yaml-load-nodes-from-file): New primitive wrapper.
+	(yaml-node->alist): New primitive wrapper.
+	(yaml-node->list): New primitive wrapper.
+	(yaml-node-type): New primitive wrapper.
+	(yaml-scalar-value): New primitive wrapper.
+	(yaml-set-indent!): New primitive wrapper.
+	(yaml-set-map-format-1!): New primitive wrapper.
+	(yaml-set-seq-format-1!): New primitive wrapper.
+
+2024-01-05  Georgios Athanasiou  <yorgath@gmail.com>
+
+	* scm/yamlpp.scm
+	(make-yaml-emitter): New primitive wrapper.
+	(yaml-emitter-good?): New primitive wrapper.
+	(yaml-emitter-string): New primitive wrapper.
+	(yaml-emit-null!): New primitive wrapper.
+	(yaml-emit-string!): New primitive wrapper.
+	(yaml-emit-boolean!): New primitive wrapper.
+	(yaml-emit-integer!): New primitive wrapper.
+	(yaml-emit-comment!): New primitive wrapper.
+	(yaml-emit-newline!): New primitive wrapper.
+	(yaml-begin-doc!): New primitive wrapper.
+	(yaml-end-doc!): New primitive wrapper.
+	(yaml-begin-seq!): New primitive wrapper.
+	(yaml-end-seq!): New primitive wrapper.
+	(yaml-begin-map!): New primitive wrapper.
+	(yaml-end-map!): New primitive wrapper.
+	(yaml-emit-key!): New primitive wrapper.
+	(yaml-emit-value!): New primitive wrapper.
+	(yaml-emit-anchor!): New primitive wrapper.
+	(yaml-emit-alias!): New primitive wrapper.
+	(yaml-set-style-1!): New primitive wrapper.
+	(yaml-set-string-format-1!): New primitive wrapper.
+	(yaml-set-bool-format-1!): New primitive wrapper.
+	(yaml-set-int-base!): New primitive wrapper.
+
 2024-01-04  Georgios Athanasiou  <yorgath@gmail.com>
 
 	* cxx/macros.h: Remove file no longer necessary.
