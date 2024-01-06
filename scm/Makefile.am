@@ -13,9 +13,10 @@ go_DATA = $(gobjects)
 # Object files should be removed by 'make clean'.
 CLEANFILES = $(gobjects)
 
-# Compile Scheme files with guild.
+# Compile Scheme files with guild.  Disable auto compilation so that
+# Guile does not try to compile guild itself!
 .scm.go:
-	$(GUILD) compile -o "$@" "$<"
+	GUILE_AUTO_COMPILE=0 $(GUILD) compile -o "$@" "$<"
 
 # Install object files *after* source files to set modification times
 # properly.  A temporary variable is used to avoid replacing the rule
