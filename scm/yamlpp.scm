@@ -27,6 +27,11 @@
   #:export (yaml-load-all-from-file)
   #:export (yaml-load-file)
   ;;
+  #:export (yaml-string-manipulators)
+  #:export (yaml-bool-manipulators)
+  #:export (yaml-int-manipulators)
+  #:export (yaml-manipulators)
+  ;;
   #:export (make-yaml-emitter)
   #:export (yaml-emitter-good?)
   #:export (yaml-emitter-string)
@@ -49,8 +54,7 @@
   #:export (yaml-set-int-base!)
   #:export (yaml-set-seq-format!)
   #:export (yaml-set-map-format!)
-  #:export (yaml-set-indent!)
-  #:export (yaml-manipulators))
+  #:export (yaml-set-indent!))
 
 ;; Make the C functions available.
 (load-extension "libguile-yamlpp" "init")
@@ -170,6 +174,70 @@ This should only be used for nodes of type 'map."
                   (expand-node (cdr pair))))
           (yaml-node->alist node)))
     (else 'undefined)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; YAML manipulators for strings.
+(define yaml-string-manipulators
+  '(auto
+    single-quoted
+    double-quoted
+    literal))
+
+;; YAML manipulators for booleans.
+(define yaml-bool-manipulators
+  '(yes-no-bool
+    true-false-bool
+    on-off-bool
+    upper-case
+    lower-case
+    camel-case
+    long-bool
+    short-bool))
+
+;; YAML manipulators for integers.
+(define yaml-int-manipulators
+  '(dec
+    hex
+    oct))
+
+;; YAML manipulators for sequences.
+(define yaml-seq-manipulators
+  '(flow
+    block))
+
+;; YAML manipulators for mappings.
+(define yaml-map-manipulators
+  '(auto
+    flow
+    block))
+
+;; List of all valid manipulators.
+(define yaml-manipulators
+  '(auto
+    ;;
+    single-quoted
+    double-quoted
+    literal
+    ;;
+    yes-no-bool
+    true-false-bool
+    on-off-bool
+    upper-case
+    lower-case
+    camel-case
+    long-bool
+    short-bool
+    ;;
+    dec
+    hex
+    oct
+    ;;
+    block
+    flow))
+
+;; Construct a list of all known YAML manipulators from the partial
+;; lists.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Wrap the primitive procedures used for emitting YAML.
@@ -386,43 +454,20 @@ valid manipulators."
   (yaml-set-style! emitter 'auto)
   (yaml-emit-string! emitter (number->string number)))
 
-;; List of valid manipulators.
-(define yaml-manipulators
-  '(auto
-    ;;
-    single-quoted
-    double-quoted
-    literal
-    ;;
-    yes-no-bool
-    true-false-bool
-    on-off-bool
-    upper-case
-    lower-case
-    camel-case
-    long-bool
-    short-bool
-    ;;
-    dec
-    hex
-    oct
-    ;;
-    block
-    flow))
-
-(define (filter-manipulators manipulators)
+(define* (filter-manipulators manipulators #:optional (valid #f))
   "Keep only the valid manipulators."
-  (let loop ((manips manipulators)
-             (result '()))
-    (if (null? manips)
-        (reverse result)
-        (let* ((manip (car manips))
-               (result (if (memq manip yaml-manipulators)
-                           (cons manip result)
-                           (begin
-                             (mention "Unknown manipulator ~S" manip)
-                             result))))
-          (loop (cdr manips) result)))))
+  (let ((valid (if valid valid yaml-manipulators)))
+        (let loop ((manips manipulators)
+                   (result '()))
+          (if (null? manips)
+              (reverse result)
+              (let* ((manip (car manips))
+                     (result (if (memq manip valid)
+                                 (cons manip result)
+                                 (begin
+                                   (mention "Unknown manipulator ~S" manip)
+                                   result))))
+                (loop (cdr manips) result))))))
 
 (define (yaml-set-style! emitter . manipulators)
   "Set the style of the next element to be emitted.
@@ -440,25 +485,25 @@ values may override previous ones."
   (for-each
    (lambda (manip)
      (yaml-set-string-format-1! emitter manip))
-   (filter-manipulators manipulators)))
+   (filter-manipulators manipulators yaml-string-manipulators)))
 
 (define (yaml-set-bool-format! emitter . manipulators)
   "Set the format of the emitted booleans."
   (for-each
    (lambda (manip)
      (yaml-set-bool-format-1! emitter manip))
-   (filter-manipulators manipulators)))
+   (filter-manipulators manipulators yaml-bool-manipulators)))
 
 (define (yaml-set-seq-format! emitter . manipulators)
   "Set the format of the emitted sequences."
   (for-each
    (lambda (manip)
      (yaml-set-seq-format-1! emitter manip))
-   (filter-manipulators manipulators)))
+   (filter-manipulators manipulators yaml-seq-manipulators)))
 
 (define (yaml-set-map-format! emitter . manipulators)
   "Set the format of the emitted mappings."
   (for-each
    (lambda (manip)
      (yaml-set-map-format-1! emitter manip))
-   (filter-manipulators manipulators)))
+   (filter-manipulators manipulators yaml-map-manipulators)))
