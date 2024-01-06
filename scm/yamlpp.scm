@@ -17,6 +17,7 @@
 ;;; <https://www.gnu.org/licenses/>.
 
 (define-module (yamlpp)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
   #:use-module (ice-9 textual-ports)
   ;;
@@ -30,6 +31,8 @@
   #:export (yaml-string-manipulators)
   #:export (yaml-bool-manipulators)
   #:export (yaml-int-manipulators)
+  #:export (yaml-seq-manipulators)
+  #:export (yaml-map-manipulators)
   #:export (yaml-manipulators)
   ;;
   #:export (make-yaml-emitter)
@@ -71,108 +74,42 @@
     (warn text)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Wrap the primitive procedures used for reading YAML.
-
-(define (yaml-load-node string)
-  "Read the first YAML document present in the string.
-
-The result is a <yaml-node> object."
-  (prim:yaml-load-node string))
-
-(define (yaml-load-nodes string)
-  "Read all the YAML documents present in the string.
-
-The result is a list of <yaml-node> objects."
-  (prim:yaml-load-nodes string))
-
-(define (yaml-load-node-from-file path)
-  "Read the first YAML document from the file at the given path.
-
-The result is a <yaml-node> object."
-  (prim:yaml-load-node-from-file path))
-
-(define (yaml-load-nodes-from-file path)
-  "Read all the YAML documents from the file at the given path.
-
-The result is a list of <yaml-node> objects."
-  (prim:yaml-load-nodes-from-file path))
-
-(define (yaml-node-type node)
-  "Return a symbol that denotes the type of the YAML node.
-
-The result is one of the following symbols:
-
-- null
-- scalar
-- sequence
-- map
-- undefined"
-  (prim:yaml-node-type node))
-
-(define (yaml-scalar-value node)
-  "Return the value stored in the scalar YAML node.
-
-This procedure should be used when it is known that NODE holds a
-scalar YAML value that it is *not* null (i.e. nulls must be treated as
-a separate case).  It tries to guess the correct type for the value,
-resorting to string when everything else fails.  The type of the
-result can be one of the following Scheme types:
-
-- boolean
-- integer
-- double
-- string"
-  (prim:yaml-scalar-value node))
-
-(define (yaml-node->list node)
-  "Return a list of nodes of a YAML sequence node.
-
-This should only be used for nodes of type 'sequence."
-  (prim:yaml-node->list node))
-
-(define (yaml-node->alist node)
-  "Return an association list from the pairs in a YAML mapping node
-
-This should only be used for nodes of type 'map."
-  (prim:yaml-node->alist node))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (yaml-load text)
   "Parse first YAML document in the string."
-  (expand-node (yaml-load-node text)))
+  (expand-node (prim:yaml-load-node text)))
 
 (define (yaml-load-all text)
   "Parse all the YAML documents in the string."
   (map (lambda (node) (expand-node node))
-       (yaml-load-nodes text)))
+       (prim:yaml-load-nodes text)))
 
 (define (yaml-load-file path)
   "Parse the first document in a YAML file."
-  (expand-node (yaml-load-node-from-file path)))
+  (expand-node (prim:yaml-load-node-from-file path)))
 
 (define (yaml-load-all-from-file path)
   "Parse all the documents in a YAML file."
   (map (lambda (node) (expand-node node))
-       (yaml-load-nodes-from-file path)))
+       (prim:yaml-load-nodes-from-file path)))
 
 (define (expand-node node)
   "Convert YAML node to list of atoms."
-  (case (yaml-node-type node)
+  (case (prim:yaml-node-type node)
     ((null)
      yaml-null)
     ((scalar)
-     (yaml-scalar-value node))
+     (prim:yaml-scalar-value node))
     ((sequence)
      ;; Convert sequence to vector, not list, like guile-json does.
      (list->vector
       (map (lambda (node) (expand-node node))
-           (yaml-node->list node))))
+           (prim:yaml-node->list node))))
     ((map)
      (map (lambda (pair)
             (cons (expand-node (car pair))
                   (expand-node (cdr pair))))
-          (yaml-node->alist node)))
+          (prim:yaml-node->alist node)))
     (else 'undefined)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -214,33 +151,23 @@ This should only be used for nodes of type 'map."
 
 ;; List of all valid manipulators.
 (define yaml-manipulators
-  '(auto
-    ;;
-    single-quoted
-    double-quoted
-    literal
-    ;;
-    yes-no-bool
-    true-false-bool
-    on-off-bool
-    upper-case
-    lower-case
-    camel-case
-    long-bool
-    short-bool
-    ;;
-    dec
-    hex
-    oct
-    ;;
-    block
-    flow))
-
-;; Construct a list of all known YAML manipulators from the partial
-;; lists.
+  (reverse
+   (fold (lambda (partial result)
+           (fold (lambda (manip result)
+                   (if (memq manip result)
+                       result
+                       (cons manip result)))
+                 result
+                 partial))
+         '()
+         (list yaml-string-manipulators
+               yaml-bool-manipulators
+               yaml-int-manipulators
+               yaml-seq-manipulators
+               yaml-map-manipulators))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Wrap the primitive procedures used for emitting YAML.
+;; Wrappers for emitter primitives.
 
 (define (make-yaml-emitter)
   "Return a new object that can be used to create YAML documents."
@@ -324,53 +251,12 @@ value of the current YAML mapping pair."
   "Add an alias using the anchor with the given name."
   (prim:yaml-emit-alias! emitter name))
 
-(define (yaml-set-style-1! emitter manipulator)
-  "Set the style for the next YAML element.
-
-MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
-valid manipulators."
-  (prim:yaml-set-style-1! emitter manipulator))
-
-(define (yaml-set-string-format-1! emitter manipulator)
-  "Affect the style of emitted YAML strings globally.
-
-MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
-valid manipulators."
-  (prim:yaml-set-string-format-1! emitter manipulator))
-
-(define (yaml-set-bool-format-1! emitter manipulator)
-  "Affect the style of emitted YAML booleans globally.
-
-MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
-valid manipulators."
-  (prim:yaml-set-bool-format-1! emitter manipulator))
-
-(define (yaml-set-int-base! emitter manipulator)
-  "Set the numeral system for the emitted integers.
-
-MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
-valid manipulators."
-  (prim:yaml-set-int-base! emitter manipulator))
-
-(define (yaml-set-seq-format-1! emitter manipulator)
-  "Affect the style of emitted YAML sequences globally.
-
-MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
-valid manipulators."
-  (prim:yaml-set-seq-format-1! emitter manipulator))
-
-(define (yaml-set-map-format-1! emitter manipulator)
-  "Affect the style of emitted YAML mappings globally.
-
-MANIPULATOR must be a symbol.  See `yaml-manipulators' for a list of
-valid manipulators."
-  (prim:yaml-set-map-format-1! emitter manipulator))
-
 (define (yaml-set-indent! emitter length)
   "Set the number of spaces used for indentation."
   (prim:yaml-set-indent! emitter length))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Scheme procedures for emitting based on primitives.
 
 (define (yaml-emit! emitter obj)
   "Write the object to the given YAML emitter."
@@ -477,33 +363,53 @@ values.  The manipulators are applied in the order they appear; later
 values may override previous ones."
   (for-each
    (lambda (manip)
-     (yaml-set-style-1! emitter manip))
+     (prim:yaml-set-style-1! emitter manip))
    (filter-manipulators manipulators)))
 
 (define (yaml-set-string-format! emitter . manipulators)
-  "Set the format of the emitted strings."
+  "Set the format of the emitted strings.
+
+See the `yaml-string-manipulators' variable for a list of valid
+manipulator values."
   (for-each
    (lambda (manip)
-     (yaml-set-string-format-1! emitter manip))
+     (prim:yaml-set-string-format-1! emitter manip))
    (filter-manipulators manipulators yaml-string-manipulators)))
 
 (define (yaml-set-bool-format! emitter . manipulators)
-  "Set the format of the emitted booleans."
+  "Set the format of the emitted booleans.
+
+See the `yaml-bool-manipulators' variable for a list of valid
+manipulator values."
   (for-each
    (lambda (manip)
-     (yaml-set-bool-format-1! emitter manip))
+     (prim:yaml-set-bool-format-1! emitter manip))
    (filter-manipulators manipulators yaml-bool-manipulators)))
 
+(define (yaml-set-int-base! emitter manipulator)
+  "Set the numeral system for the emitted integers.
+
+See the `yaml-int-manipulators' variable for a list of valid
+manipulator values."
+  (when (memq manipulator yaml-int-manipulators)
+    (prim:yaml-set-int-base! emitter manipulator)))
+
 (define (yaml-set-seq-format! emitter . manipulators)
-  "Set the format of the emitted sequences."
+  "Set the format of the emitted sequences.
+
+See the `yaml-seq-manipulators' variable for a list of valid
+manipulator values."
   (for-each
    (lambda (manip)
-     (yaml-set-seq-format-1! emitter manip))
+     (prim:yaml-set-seq-format-1! emitter manip))
    (filter-manipulators manipulators yaml-seq-manipulators)))
 
 (define (yaml-set-map-format! emitter . manipulators)
-  "Set the format of the emitted mappings."
+  "Set the format of the emitted mappings.
+
+See the `yaml-map-manipulators' variable for a list of valid
+manipulator values."
   (for-each
    (lambda (manip)
-     (yaml-set-map-format-1! emitter manip))
+     (prim:yaml-set-map-format-1! emitter manip))
    (filter-manipulators manipulators yaml-map-manipulators)))
