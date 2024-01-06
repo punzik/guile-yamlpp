@@ -2,7 +2,6 @@ guileextdir = $(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)
 guileext_LTLIBRARIES = libguile-yamlpp.la
 
 libguile_yamlpp_la_SOURCES = \
-  macros.h \
   util.cxx \
   util.h \
   reader.cxx \
