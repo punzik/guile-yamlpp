@@ -33,8 +33,8 @@ distributed archive.  Download the archive of the latest [[https://gitlab.com/yo
 run the following commands:
 
 #+BEGIN_SRC sh
-  tar -xf guile-yamlpp-0.1.tar.gz
-  cd guile-yamlpp-0.1
+  tar -xf guile-yamlpp-0.2.tar.gz
+  cd guile-yamlpp-0.2
   ./configure && make && sudo make install
 #+END_SRC
 
@@ -245,7 +245,7 @@ whose effect should be obvious:
 | ~oct~             | integer       |
 | ~block~           | sequence, map |
 | ~flow~            | sequence, map |
-| ~auto~            | everything    |
+| ~auto~            | string, map   |
 
 You can set the format of a specific type globally by using the
 following procedures:

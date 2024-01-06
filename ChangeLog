@@ -1,5 +1,7 @@
 2024-01-06  Georgios Athanasiou  <yorgath@gmail.com>
 
+	Separate manipulators by target type for better documentation
+
 	* scm/yamlpp.scm
 	(yaml-set-indent!): Wrap the corresponding primitive.
 	(yaml-string-manipulators): New variable that holds the
@@ -27,6 +29,8 @@
 
 2024-01-05  Georgios Athanasiou  <yorgath@gmail.com>
 
+	Wrap primitives to improve documentation
+
 	* scm/yamlpp.scm
 	(make-yaml-emitter): Wrap the corresponding primitive.
 	(yaml-emitter-good?): Wrap the corresponding primitive.
@@ -50,6 +54,8 @@
 	(yaml-set-int-base!): Wrap the corresponding primitive.
 
 2024-01-04  Georgios Athanasiou  <yorgath@gmail.com>
+
+	Move initialization code to appropriate files
 
 	* cxx/macros.h: Remove file no longer necessary.
 
@@ -94,9 +100,8 @@
 	(yaml_node_to_list): Make it static.
 	(yaml_node_type): Make it static.
 
-	* cxx/init.cxx (init): Move initialization code to reader.cxx and
-	emitter.cxx.
-
+	* cxx/init.cxx (init): Move initialization code to 'reader.cxx'
+	and 'emitter.cxx'.
 
 2024-01-03  Georgios Athanasiou  <yorgath@gmail.com>
 
