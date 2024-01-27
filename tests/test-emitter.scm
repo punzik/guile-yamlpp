@@ -57,6 +57,27 @@
     "~"
     (yaml-emitter-string emitter)))
 
+;; Write null in all available formats.
+(let ((emitter (make-yaml-emitter)))
+  (yaml-set-style! emitter 'flow)
+  (yaml-begin-seq! emitter)
+  (for-each (lambda (manip)
+              (yaml-set-style! emitter manip)
+              (yaml-emit! emitter yaml-null))
+            yaml-null-manipulators)
+  (yaml-end-seq! emitter)
+  (test-equal "emit:null-styles"
+    "[null, NULL, Null, ~]"
+    (yaml-emitter-string emitter)))
+
+;; Globally set the format of nulls.
+(let ((emitter (make-yaml-emitter)))
+  (yaml-set-null-format! emitter 'upper-null)
+  (yaml-emit! emitter yaml-null)
+  (test-equal "emit:format-null"
+    "NULL"
+    (yaml-emitter-string emitter)))
+
 ;; Null symbols in strings must be quoted automatically.
 (let* ((emitter (make-yaml-emitter))
        (string (symbol->string yaml-null))

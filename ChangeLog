@@ -1,4 +1,10 @@
+2024-01-28  Georgios Athanasiou  <yorgath@gmail.com>
+
+	* tests/test-emitter.scm: Add tests for null values.
+
 2024-01-27  Georgios Athanasiou  <yorgath@gmail.com>
+
+	Take advantage of yaml-cpp >= 0.7.0.
 
 	* scm/yamlpp.scm
 	(yaml-null-manipulators): New variable that holds the manipulators
