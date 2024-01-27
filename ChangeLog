@@ -1,5 +1,16 @@
 2024-01-27  Georgios Athanasiou  <yorgath@gmail.com>
 
+	* scm/yamlpp.scm
+	(yaml-null-manipulators): New variable that holds the manipulators
+	relevant to null values.
+	(yaml-manipulators): Include the null manipulators.
+	(yaml-set-null-format!): New procedure to set the null format.
+
+	* cxx/emitter.cxx
+	(manipulator): Add null manipulators.
+	(set_null_format): New function to set the format for null values.
+	(init_emitter): Export the set_null_format function.
+
 	* tests/test-reader.scm: Activate previously skipped test that
 	failed with yaml-cpp 0.6.3.
 

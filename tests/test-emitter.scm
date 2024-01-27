@@ -50,7 +50,7 @@
 
 ;; Write the null value.  Note that the YAML representation of the
 ;; null value is not necessarily the same as the Scheme one!  Nulls
-;; are always written as tildes with yaml-cpp 0.6.3.
+;; are written as tildes by default.
 (let ((emitter (make-yaml-emitter)))
   (yaml-emit! emitter yaml-null)
   (test-equal "emit:null"

@@ -109,6 +109,11 @@ manipulator (SCM scm_symbol)
   static SCM sym_squote  = scm_from_utf8_symbol ("single-quoted");
   static SCM sym_dquote  = scm_from_utf8_symbol ("double-quoted");
   static SCM sym_literal = scm_from_utf8_symbol ("literal");
+  // Null.
+  static SCM sym_lower_null = scm_from_utf8_symbol ("lower-null");
+  static SCM sym_upper_null = scm_from_utf8_symbol ("upper-null");
+  static SCM sym_camel_null = scm_from_utf8_symbol ("camel-null");
+  static SCM sym_tilde_null = scm_from_utf8_symbol ("tilde-null");
   // Booleans.
   static SCM sym_yes   = scm_from_utf8_symbol ("yes-no-bool");
   static SCM sym_true  = scm_from_utf8_symbol ("true-false-bool");
@@ -135,6 +140,15 @@ manipulator (SCM scm_symbol)
     return YAML::DoubleQuoted;
   else if (scm_is_eq (scm_symbol, sym_literal))
     return YAML::Literal;
+  //
+  else if (scm_is_eq (scm_symbol, sym_lower_null))
+    return YAML::LowerNull;
+  else if (scm_is_eq (scm_symbol, sym_upper_null))
+    return YAML::UpperNull;
+  else if (scm_is_eq (scm_symbol, sym_camel_null))
+    return YAML::CamelNull;
+  else if (scm_is_eq (scm_symbol, sym_tilde_null))
+    return YAML::TildeNull;
   //
   else if (scm_is_eq (scm_symbol, sym_yes))
     return YAML::YesNoBool;
@@ -209,18 +223,6 @@ emitter_string (SCM scm_emitter)
 
 
 /**
- * Write the null symbol to the emitter.
- */
-static SCM
-emit_null (SCM scm_emitter)
-{
-  YAML::Emitter *emitter = c_emitter (scm_emitter);
-  *emitter << YAML::Null;
-  return SCM_UNDEFINED;
-}
-
-
-/**
  * Write a string to the YAML emitter.
  */
 static SCM
@@ -229,6 +231,18 @@ emit_string (SCM scm_emitter, SCM scm_string)
   YAML::Emitter *emitter = c_emitter (scm_emitter);
   std::string str = scm_to_cxx_string (scm_string);
   *emitter << str;
+  return SCM_UNDEFINED;
+}
+
+
+/**
+ * Write the null symbol to the emitter.
+ */
+static SCM
+emit_null (SCM scm_emitter)
+{
+  YAML::Emitter *emitter = c_emitter (scm_emitter);
+  *emitter << YAML::Null;
   return SCM_UNDEFINED;
 }
 
@@ -434,6 +448,19 @@ set_string_format (SCM scm_emitter, SCM scm_symbol)
 
 
 /**
+ * Set the format to emit null in.
+ */
+static SCM
+set_null_format (SCM scm_emitter, SCM scm_symbol)
+{
+  YAML::Emitter *emitter = c_emitter (scm_emitter);
+  auto manip = manipulator (scm_symbol);
+  emitter->SetNullFormat(manip);
+  return SCM_UNDEFINED;
+}
+
+
+/**
  * Set the format to emit booleans in.
  */
 static SCM
@@ -518,12 +545,12 @@ init_emitter ()
     scm_c_define_gsubr ("prim:yaml-emitter-string", 1, 0, 0, subr);
   }
   {
-    void *subr = reinterpret_cast<void*> (emit_null);
-    scm_c_define_gsubr ("prim:yaml-emit-null!", 1, 0, 0, subr);
-  }
-  {
     void *subr = reinterpret_cast<void*> (emit_string);
     scm_c_define_gsubr ("prim:yaml-emit-string!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (emit_null);
+    scm_c_define_gsubr ("prim:yaml-emit-null!", 1, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (emit_boolean);
@@ -588,6 +615,10 @@ init_emitter ()
   {
     void *subr = reinterpret_cast<void*> (set_string_format);
     scm_c_define_gsubr ("prim:yaml-set-string-format-1!", 2, 0, 0, subr);
+  }
+  {
+    void *subr = reinterpret_cast<void*> (set_null_format);
+    scm_c_define_gsubr ("prim:yaml-set-null-format-1!", 2, 0, 0, subr);
   }
   {
     void *subr = reinterpret_cast<void*> (set_bool_format);

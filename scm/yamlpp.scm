@@ -29,6 +29,7 @@
   #:export (yaml-load-file)
   ;;
   #:export (yaml-string-manipulators)
+  #:export (yaml-null-manipulators)
   #:export (yaml-bool-manipulators)
   #:export (yaml-int-manipulators)
   #:export (yaml-seq-manipulators)
@@ -53,6 +54,7 @@
   #:export (yaml-emit-alias!)
   #:export (yaml-set-style!)
   #:export (yaml-set-string-format!)
+  #:export (yaml-set-null-format!)
   #:export (yaml-set-bool-format!)
   #:export (yaml-set-int-base!)
   #:export (yaml-set-seq-format!)
@@ -121,6 +123,13 @@
     double-quoted
     literal))
 
+;; YAML manipulators for null.
+(define yaml-null-manipulators
+  '(lower-null
+    upper-null
+    camel-null
+    tilde-null))
+
 ;; YAML manipulators for booleans.
 (define yaml-bool-manipulators
   '(yes-no-bool
@@ -161,6 +170,7 @@
                  partial))
          '()
          (list yaml-string-manipulators
+               yaml-null-manipulators
                yaml-bool-manipulators
                yaml-int-manipulators
                yaml-seq-manipulators
@@ -185,13 +195,13 @@ element (e.g. a sequence) when one of its children is still open."
   "Return the contents of the YAML EMITTER as a string."
   (prim:yaml-emitter-string emitter))
 
-(define (yaml-emit-null! emitter)
-  "Emit the null YAML value."
-  (prim:yaml-emit-null! emitter))
-
 (define (yaml-emit-string! emitter string)
   "Write a string to the YAML document."
   (prim:yaml-emit-string! emitter string))
+
+(define (yaml-emit-null! emitter)
+  "Emit the null YAML value."
+  (prim:yaml-emit-null! emitter))
 
 (define (yaml-emit-boolean! emitter boolean)
   "Write a boolean value to the YAML document."
@@ -291,12 +301,12 @@ value of the current YAML mapping pair."
 (define (yaml-emit-scalar! emitter obj)
   "Write the scalar object to the given YAML emitter."
   (cond
-   ((eq? yaml-null obj)
-    (yaml-emit-null! emitter))
    ((string? obj)
     (yaml-emit-string! emitter obj))
    ((char? obj)
     (yaml-emit-string! emitter (string obj)))
+   ((eq? yaml-null obj)
+    (yaml-emit-null! emitter))
    ((boolean? obj)
     (yaml-emit-boolean! emitter obj))
    ((number? obj)
@@ -375,6 +385,16 @@ manipulator values."
    (lambda (manip)
      (prim:yaml-set-string-format-1! emitter manip))
    (filter-manipulators manipulators yaml-string-manipulators)))
+
+(define (yaml-set-null-format! emitter . manipulators)
+  "Set the format to emit null values in.
+
+See the `yaml-null-manipulators' variable for a list of valid
+manipulator values."
+  (for-each
+   (lambda (manip)
+     (prim:yaml-set-null-format-1! emitter manip))
+   (filter-manipulators manipulators yaml-null-manipulators)))
 
 (define (yaml-set-bool-format! emitter . manipulators)
   "Set the format of the emitted booleans.
