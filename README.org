@@ -9,18 +9,7 @@ in Guile Scheme.  It is a wrapper around the [[https://github.com/jbeder/yaml-cp
 ** Install on GNU Guix
 
 Installation is relatively straightforward if you are using the [[https://guix.gnu.org/][Guix]]
-package manager.  To find out whether the package is available on your
-system, run:
-
-#+BEGIN_SRC sh
-  guix search guile-yamlpp
-#+END_SRC
-
-If the package is not yet available, add the [[https://gitlab.com/yorgath/guix-channel][developer's channel]] to
-your list of channels (as described in the Guix [[https://guix.gnu.org/manual/en/html_node/Specifying-Additional-Channels.html][manual]]), then run
-~guix pull~.
-
-Execute this command to install the package:
+package manager.  Just run:
 
 #+BEGIN_SRC sh
   guix install guile-yamlpp
@@ -29,12 +18,14 @@ Execute this command to install the package:
 ** Install using a distribution tarball
 
 If you are not on Guix, you can install the module from the
-distributed archive.  Download the archive of the latest [[https://gitlab.com/yorgath/guile-yamlpp/-/releases][release]] and
-run the following commands:
+distributed archive.  You must have ~yaml-cpp~ version 0.7.0 or
+greater installed on your system, including the C++ header files.  To
+build and install ~guile-yamlpp~, download the archive of the latest
+[[https://gitlab.com/yorgath/guile-yamlpp/-/releases][release]] and run the following commands:
 
 #+BEGIN_SRC sh
-  tar -xf guile-yamlpp-0.2.tar.gz
-  cd guile-yamlpp-0.2
+  tar -xf guile-yamlpp-0.3.tar.gz
+  cd guile-yamlpp-0.3
   ./configure && make && sudo make install
 #+END_SRC
 
@@ -131,8 +122,8 @@ following in mind:
   emit booleans in the older YAML 1.1 alternative styles (not
   recommended).
 - You must use the ~'null~ symbol to write the null value in a YAML
-  document.  Note that this is always written as a tilde (=~=) in
-  YAML.  There is no way to change this with ~yaml-cpp~ 0.6.3.
+  document.  Note that this is written out as a tilde (=~=) by default
+  (the next section describes how to select a different format).
 - Symbols are /not/ converted to strings.  It is an error to try to
   emit a symbol (except ~'null~).
 - Scheme vectors, /not/ lists, are emitted as YAML sequences.
@@ -232,6 +223,10 @@ whose effect should be obvious:
 | ~double-quoted~   | string        |
 | ~single-quoted~   | string        |
 | ~literal~         | string        |
+| ~lower-null~      | null          |
+| ~upper-null~      | null          |
+| ~camel-null~      | null          |
+| ~tilde-null~      | null          |
 | ~yes-no-bool~     | boolean       |
 | ~true-false-bool~ | boolean       |
 | ~on-off-bool~     | boolean       |
@@ -251,6 +246,7 @@ You can set the format of a specific type globally by using the
 following procedures:
 
 - ~yaml-set-string-format!~
+- ~yaml-set-null-format!~
 - ~yaml-set-bool-format!~
 - ~yaml-set-int-base!~
 - ~yaml-set-seq-format!~

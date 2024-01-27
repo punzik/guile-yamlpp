@@ -21,7 +21,7 @@
 
 (package
   (name "guile-yamlpp")
-  (version "dev")
+  (version "0.3")
   (source (local-file "." "guile-yamlpp-dev-checkout"
                       #:recursive? #t
                       #:select? vcs-file?))

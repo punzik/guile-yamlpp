@@ -4,7 +4,7 @@
 AC_PREREQ([2.69])
 AC_INIT(
   [guile-yamlpp],
-  [0.2],
+  [0.3],
   [yorgath@gmail.com],
   [guile-yamlpp],
   [https://gitlab.com/yorgath/guile-yamlpp])

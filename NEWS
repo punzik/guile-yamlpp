@@ -8,6 +8,13 @@ Copyright © 2023-2024 Georgios Athanasiou <yorgath@gmail.com>
 
 Please send Guile YAMLPP bug reports to yorgath@gmail.com.
 
+* Changes in 0.3 (since 0.2)
+
+  - The ability to affect the format of emitted null values has been
+    implemented.
+
+  - Minimum yaml-cpp version is now 0.7.0.
+
 * Changes in 0.2 (since 0.1)
 
   - All exported procedures are now documented.
