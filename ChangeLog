@@ -1,3 +1,8 @@
+2024-01-27  Georgios Athanasiou  <yorgath@gmail.com>
+
+	* tests/test-reader.scm: Activate previously skipped test that
+	failed with yaml-cpp 0.6.3.
+
 2024-01-06  Georgios Athanasiou  <yorgath@gmail.com>
 
 	Separate manipulators by target type for better documentation

@@ -50,8 +50,7 @@
   "26"
   (yaml-load "!<tag:yaml.org,2002:str> 26"))
 
-;; TODO: Fails with yaml-cpp 0.6.3!
-(test-skip 1)
+;; Empty tag must yield null.
 (test-eq "read:empty-tagged-string"
   yaml-null
   (yaml-load "!!str"))
