@@ -22,6 +22,13 @@ dnl Guile specific initialization.
 GUILE_PKG([3.0])
 GUILE_PROGS
 
+dnl Use this in the Makefile to properly set up cross-compilation with
+dnl guild.  Lifted verbatim from guile-hall.
+if test "$cross_compiling" != no; then
+   GUILE_TARGET="--target=$host_alias"
+   AC_SUBST([GUILE_TARGET])
+fi
+
 dnl Checks for programs.
 AC_PROG_CXX
 AC_PROG_AWK
@@ -32,8 +39,8 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 dnl Checks for libraries.
-PKG_CHECK_MODULES([YAML], [yaml-cpp])
-PKG_CHECK_MODULES([GUILE], [guile-$GUILE_EFFECTIVE_VERSION])
+PKG_CHECK_MODULES([YAML], [yaml-cpp >= 0.7.0])
+PKG_CHECK_MODULES([GUILE], [guile-$GUILE_EFFECTIVE_VERSION >= 3.0])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL

@@ -18,10 +18,14 @@ package manager.  Just run:
 ** Install using a distribution tarball
 
 If you are not on Guix, you can install the module from the
-distributed archive.  You must have ~yaml-cpp~ version 0.7.0 or
-greater installed on your system, including the C++ header files.  To
-build and install ~guile-yamlpp~, download the archive of the latest
-[[https://gitlab.com/yorgath/guile-yamlpp/-/releases][release]] and run the following commands:
+distributed archive.  Make sure you have the following libraries
+installed on your system, including C/C++ header files:
+
+- ~yaml-cpp~ >= 0.7.0
+- ~guile~ >= 3.0
+
+To build and install ~guile-yamlpp~, download the archive of the
+latest [[https://gitlab.com/yorgath/guile-yamlpp/-/releases][release]] and run the following commands:
 
 #+BEGIN_SRC sh
   tar -xf guile-yamlpp-0.3.tar.gz
@@ -403,7 +407,7 @@ least):
 - The GNU C++ toolchain
 - GNU Automake
 - The ~pkg-config~ tool
-- The ~yaml-cpp~ library (including headers)
+- The ~yaml-cpp~ library, version 0.7.0 or later (including headers)
 - Guile 3.0 (including headers)
 
 The project uses GNU Automake for its build system.  Follow the
