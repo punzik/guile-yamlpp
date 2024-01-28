@@ -62,7 +62,7 @@ straightforward, provided you keep in mind the following rules:
 
 - YAML sequences are converted to Scheme vectors.
 - YAML mappings are converted to association lists.
-- Null values are converted to the ~'null~ symbol.
+- Null values are converted to the ~null~ symbol.
 
 ** ~yaml-load-all~
 
@@ -125,11 +125,11 @@ following in mind:
   respectively by default.  The next section describes how you can
   emit booleans in the older YAML 1.1 alternative styles (not
   recommended).
-- You must use the ~'null~ symbol to write the null value in a YAML
+- You must use the ~null~ symbol to write the null value in a YAML
   document.  Note that this is written out as a tilde (=~=) by default
   (the next section describes how to select a different format).
 - Symbols are /not/ converted to strings.  It is an error to try to
-  emit a symbol (except ~'null~).
+  emit a symbol (except ~null~).
 - Scheme vectors, /not/ lists, are emitted as YAML sequences.
 - Association lists are emitted as YAML mappings.
 
